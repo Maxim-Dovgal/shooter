@@ -1,6 +1,12 @@
 from pygame import *
 from random import randint
 
+font.init()
+font1 = font.Font(None, 80)
+win = font1.render('YOU WIN!', True, (255, 255, 255))
+lose = font1.render('YOU LOSE!', True, (180, 0, 0))
+font2 = font.Font(None, 36)
+
 class GameSprite(sprite.Sprite):
     def __init__(self, player_image, player_x, player_y, s_width, s_height, player_speed):
         super().__init__()
@@ -79,7 +85,7 @@ while game:
             game = False
         if e.type == MOUSEBUTTONDOWN:
             player.fire()
-
+    
     if not finish:
         window.blit(backround, (0, 0))
         player.update()
@@ -88,7 +94,30 @@ while game:
         monsters.draw(window)
         bullets.update()
         bullets.draw(window)
+        collides = sprite.groupcollide(monsters, bullets, True, True)
+        for c in collides:
+            score = score + 1
+            monster = Enemy('vorox.png', randint(80, win_width - 80), -40, 80, 50, randint(1, 5))
+            monsters.add(monster)
+        if sprite.spritecollide(player, monsters, False):
+            sprite.spritecollide(player, monsters, True)
+            life = life - 1
+        text = font2.render('Рахунок: ' + str(score), 1, (255, 255, 255))
+        window.blit(text, (10, 20))
 
-    clock.tick(FPS)
+        text_lose = font2.render('Пропущено: ' + str(lost), 1, (255, 255, 255))
+        window.blit(text_lose, (10, 50))
 
+        if life == 3:
+            life_color = (0, 150, 0)
+        if life == 2:
+            life_color = (150, 150, 0)
+        if life == 1:
+            life_color = (150, 0, 0)
+
+        text_life = font1.render(str(life), 1, life_color)
+        window.blit(text_life, (win_width - 50, 10))
+
+
+    clock.tick(60)
     display.update()
