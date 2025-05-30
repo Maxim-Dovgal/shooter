@@ -47,6 +47,20 @@ class Enemy(GameSprite):
             self.rect.y = 0
             lost = lost + 1
 
+class Boss(GameSprite):
+    hp = 19
+    def update(self):
+        self.rect.y += self.speed
+        global lost
+        if self.hp <= 0:
+            self.rect.y = -100
+            self.hp = 19
+        if self.rect.y > win_height:
+            self.rect.x = randint(80, win_width - 80)
+            self.rect.y = 0
+            lost = lost + 1
+
+
 class Bullet(GameSprite):
     def update(self):
         self.rect.y += self.speed
@@ -66,6 +80,7 @@ backround = transform.scale(
 )
 
 player = Player('ar15.png', win_width / 2, win_height - 100, 100, 100, 20)
+boss = Boss("vorox.png", randint(80, win_width - 80), -40, 80, 120, 1)
 
 monsters = sprite.Group()
 for i in range(1, 6):
@@ -95,7 +110,8 @@ while game:
         bullets.update()
         bullets.draw(window)
         collides = sprite.groupcollide(monsters, bullets, True, True)
-
+        boss.update()
+        boss.draw()
         if life <= 0 or lost >= max_lost:
             finish = True
             window.blit(lose, (1040, 570))
@@ -103,7 +119,9 @@ while game:
         if score >= goal:
             finish = True
             window.blit(win, (1040, 570))
-
+        if sprite.spritecollide(boss, bullets, False):
+            boss.hp -= 1
+            sprite.spritecollide(boss, bullets, True)
         for c in collides:
             score = score + 1
             monster = Enemy('vorox.png', randint(80, win_width - 80), -40, 80, 50, randint(1, 5))
@@ -116,7 +134,7 @@ while game:
 
         text_lose = font2.render('Пропущено: ' + str(lost), 1, (255, 255, 255))
         window.blit(text_lose, (10, 50))
-
+        print(boss.hp)
         if life == 3:
             life_color = (0, 150, 0)
         if life == 2:
