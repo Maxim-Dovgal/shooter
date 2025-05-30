@@ -95,6 +95,15 @@ while game:
         bullets.update()
         bullets.draw(window)
         collides = sprite.groupcollide(monsters, bullets, True, True)
+
+        if life <= 0 or lost >= max_lost:
+            finish = True
+            window.blit(lose, (1040, 570))
+        
+        if score >= goal:
+            finish = True
+            window.blit(win, (1040, 570))
+
         for c in collides:
             score = score + 1
             monster = Enemy('vorox.png', randint(80, win_width - 80), -40, 80, 50, randint(1, 5))
